@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestro Control de Periodo</title>
+    <!-- Tailwind CSS para diseño moderno y responsivo -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Estilos personalizados para el calendario */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+    </style>
+</head>
+<body class="bg-pink-50 text-gray-800 min-h-screen font-sans pb-12">
+
+    <!-- Encabezado Principal -->
+    <header class="bg-gradient-to-r from-rose-400 to-pink-500 text-white text-center py-4 shadow-md sticky top-0 z-50">
+        <h1 class="text-xl font-bold tracking-wide">🌸 Nuestro Registro de Ciclo</h1>
+        <p class="text-xs opacity-90">Control de periodo, síntomas y anticonceptivo</p>
+    </header>
+
+    <!-- Contenedor Principal (Responsivo: 1 columna en móvil, 2 en pantallas grandes) -->
+    <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- COLUMNA IZQUIERDA: INGRESO DE DATOS (Ocupa 5 columnas en PC) -->
+        <section class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-pink-100">
+            <h2 class="text-lg font-bold text-rose-600 mb-4 flex items-center gap-2">
+                📝 Registrar Día
+            </h2>
+            
+            <form id="trackerForm" class="space-y-4">
+                <!-- Selector de Fecha -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Selecciona la Fecha:</label>
+                    <input type="date" id="selectedDate" class="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-300 outline-none" required>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <!-- Estado del Periodo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Estado del Periodo:</label>
+                    <div class="flex gap-4">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="periodStatus" value="inicio" class="text-rose-500 focus:ring-rose-400">
+                            <span class="ml-2 text-sm text-gray-700">Inició hoy</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="periodStatus" value="continua" class="text-rose-500 focus:ring-rose-400">
+                            <span class="ml-2 text-sm text-gray-700">Continúa / Terminó</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="periodStatus" value="no" checked class="text-rose-500 focus:ring-rose-400">
+                            <span class="ml-2 text-sm text-gray-700">No tengo el periodo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Síntomas -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Síntomas del día:</label>
+                    <input type="text" id="symptoms" placeholder="Ej: Cólicos, dolor de cabeza, fatiga..." class="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-300 outline-none">
+                </div>
+
+                <!-- Calificación del Síntoma (Stickers) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">¿Cómo te sientes hoy? (Sticker):</label>
+                    <div class="grid grid-cols-5 gap-2 text-center">
+                        <label class="cursor-pointer border border-gray-200 p-2 rounded-xl block hover:bg-red-50" id="lbl-mood-1">
+                            <input type="radio" name="mood" value="🤬" class="hidden">
+                            <div class="text-xl">🤬</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Malísimo</div>
+                        </label>
+                        <label class="cursor-pointer border border-gray-200 p-2 rounded-xl block hover:bg-orange-50" id="lbl-mood-2">
+                            <input type="radio" name="mood" value="😢" class="hidden">
+                            <div class="text-xl">😢</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Malo</div>
+                        </label>
+                        <label class="cursor-pointer border border-gray-200 p-2 rounded-xl block hover:bg-yellow-50" id="lbl-mood-3">
+                            <input type="radio" name="mood" value="😐" checked class="hidden">
+                            <div class="text-xl">😐</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Regular</div>
+                        </label>
+                        <label class="cursor-pointer border border-gray-200 p-2 rounded-xl block hover:bg-green-50" id="lbl-mood-4">
+                            <input type="radio" name="mood" value="🙂" class="hidden">
+                            <div class="text-xl">🙂</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Bueno</div>
+                        </label>
+                        <label class="cursor-pointer border border-gray-200 p-2 rounded-xl block hover:bg-emerald-50" id="lbl-mood-5">
+                            <input type="radio" name="mood" value="✨" class="hidden">
+                            <div class="text-xl">✨</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Buenísimo</div>
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <!-- Métricas en Pareja -->
+                <div class="bg-rose-50 p-3 rounded-xl space-y-3">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="hadSex" class="rounded text-rose-500 focus:ring-rose-400">
+                        <span class="ml-2 text-sm font-medium text-gray-700">💞 Tuvimos relaciones hoy</span>
+                    </label>
+
+                    <div>
+                        <label class="inline-flex items-center cursor-pointer mb-1">
+                            <input type="checkbox" id="injectionDay" class="rounded text-rose-500 focus:ring-rose-400">
+                            <span class="ml-2 text-sm font-medium text-gray-700">💉 Me apliqué la inyección hoy</span>
+                        </label>
+                        <div class="mt-1">
+                            <label class="block text-[11px] text-gray-500">Duración de la inyección:</label>
+                            <select id="injectionDuration" class="w-full p-1.5 bg-white border border-gray-200 rounded-lg text-xs">
+                                <option value="30">Mensual (30 días de cobertura)</option>
+                                <option value="90">Trimestral (90 días de cobertura)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Guardar -->
+                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-sm cursor-pointer">
+                    💾 Guardar Datos del Día
+                </button>
+            </form>
+        </section>
+
+        <!-- COLUMNA DERECHA: CALENDARIO (Ocupa 7 columnas en PC) -->
+        <section class="lg:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-pink-100 flex flex-col">
+            
+            <!-- Controles del Mes -->
+            <div class="flex justify-between items-center mb-4">
+                <button id="prevMonth" class="p-2 hover:bg-gray-100 rounded-full text-rose-500 font-bold text-lg cursor-pointer">◀</button>
+                <h3 id="calendarMonthYear" class="text-lg font-bold text-gray-700 uppercase tracking-wider"></h3>
+                <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-full text-rose-500 font-bold text-lg cursor-pointer">▶</button>
+            </div>
+
+            <!-- Leyenda rápida -->
+            <div class="flex flex-wrap gap-2 text-[11px] mb-4 bg-gray-50 p-2 rounded-lg justify-center">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded-full block"></span> Periodo</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-pink-200 rounded-full block border border-dashed border-pink-400"></span> Tentativa</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-purple-400 rounded-full block"></span> Inyección</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-purple-100 rounded-full block"></span> Cobertura Iny.</span>
+                <span class="flex items-center gap-1">💞 Relaciones</span>
+            </div>
+
+            <!-- Días de la semana -->
+            <div class="calendar-grid text-center font-semibold text-xs text-gray-400 mb-2">
+                <div>DOM</div><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div>SÁB</div>
+            </div>
+
+            <!-- Contenedor Dinámico de Días -->
+            <div id="calendarDays" class="calendar-grid gap-1 flex-1"></div>
+        </section>
+    </main>
+
+    <!-- JavaScript Lógica del Sistema -->
+    <script>
+        // Inicializar base de datos local si no existe
+        if (!localStorage.getItem('periodTrackerData')) {
+            localStorage.setItem('periodTrackerData', JSON.stringify({}));
+        }
+
+        let currentDate = new Date();
+        const form = document.getElementById('trackerForm');
+        const dateInput = document.getElementById('selectedDate');
+
+        // Poner la fecha de hoy por defecto en el input
+        const todayStr = currentDate.toISOString().split('T')[0];
+        dateInput.value = todayStr;
+
+        // Manejar estilos visuales de los botones de stickers (Radio buttons)
+        const moodRadios = document.querySelectorAll('input[name="mood"]');
+        function updateMoodVisuals() {
+            moodRadios.forEach(radio => {
+                const parent = radio.parentElement;
+                if (radio.checked) {
+                    parent.classList.add('border-rose-400', 'bg-rose-50', 'scale-105');
+                } else {
+                    parent.classList.remove('border-rose-400', 'bg-rose-50', 'scale-105');
+                }
+            });
+        }
+        moodRadios.forEach(radio => radio.addEventListener('change', updateMoodVisuals));
+        updateMoodVisuals();
+
+        // Guardar Datos
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const db = JSON.parse(localStorage.getItem('periodTrackerData'));
+            const dateKey = dateInput.value;
+
+            const periodStatus = document.querySelector('input[name="periodStatus"]:checked').value;
+            const symptoms = document.getElementById('symptoms').value.trim();
+            const mood = document.querySelector('input[name="mood"]:checked').value;
+            const hadSex = document.getElementById('hadSex').checked;
+            const injectionDay = document.getElementById('injectionDay').checked;
+            const injectionDuration = parseInt(document.getElementById('injectionDuration').value);
+
+            db[dateKey] = {
+                periodStatus,
+                symptoms,
+                mood,
+                hadSex,
+                injectionDay,
+                injectionDuration: injectionDay ? injectionDuration : null
+            };
+
+            localStorage.setItem('periodTrackerData', JSON.stringify(db));
+            alert('¡Datos guardados correctamente!');
+            renderCalendar();
+            form.reset();
+            dateInput.value = dateKey;
+            updateMoodVisuals();
+        });
+
+        // Buscar rangos de inyección activa
+        function getInjectionActiveRanges(db) {
+            let activeDays = {};
+            Object.keys(db).forEach(dateStr => {
+                if (db[dateStr].injectionDay && db[dateStr].injectionDuration) {
+                    let start = new Date(dateStr + 'T00:00:00');
+                    let duration = db[dateStr].injectionDuration;
+                    for (let i = 0; i < duration; i++) {
+                        let current = new Date(start);
+                        current.setDate(start.getDate() + i);
+                        let dStr = current.toISOString().split('T')[0];
+                        activeDays[dStr] = true;
+                    }
+                }
+            });
+            return activeDays;
+        }
+
+        // Calcular la predicción tentativa del siguiente mes basado en el mes anterior
+        function getTentativeDays(db, year, month) {
+            let tentativeDays = {};
+            // Buscaremos si hubo un inicio de periodo en los últimos 45 días
+            let currentViewDate = new Date(year, month, 1);
+            
+            Object.keys(db).forEach(dateStr => {
+                if (db[dateStr].periodStatus === 'inicio') {
+                    let pastPeriodStart = new Date(dateStr + 'T00:00:00');
+                    
+                    // Sumamos un ciclo promedio aproximado de 28 días para estimar la llegada
+                    let nextEstimatedStart = new Date(pastPeriodStart);
+                    nextEstimatedStart.setDate(pastPeriodStart.getDate() + 28);
+                    
+                    // Asumiremos que dura una media de 5 días basándonos en tu ejemplo (del 7 al 12)
+                    for(let i = 0; i < 5; i++) {
+                        let predictionDay = new Date(nextEstimatedStart);
+                        predictionDay.setDate(nextEstimatedStart.getDate() + i);
+                        let pStr = predictionDay.toISOString().split('T')[0];
+                        tentativeDays[pStr] = true;
+                    }
+                }
+            });
+            return tentativeDays;
+        }
+
+        // Renderizar Calendario
+        function renderCalendar() {
+            const db = JSON.parse(localStorage.getItem('periodTrackerData'));
+            const injectionRanges = getInjectionActiveRanges(db);
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+
+            const tentativeRanges = getTentativeDays(db, year, month);
+
+            const calendarDaysContainer = document.getElementById('calendarDays');
+            calendarDaysContainer.innerHTML = '';
+
+            // Espacios en blanco para los días antes del primer día del mes
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                calendarDaysContainer.appendChild(emptyDiv);
+            }
+
+            // Crear cada día del mes
+            for (let day = 1; day <= lastDay; day++) {
+                const dayDiv = document.createElement('div');
+                // Formato ISO local para comparar llaves
+                const meshMonth = (month + 1) < 10 ? `0${month + 1}` : month + 1;
+                const meshDay = day < 10 ? `0${day}` : day;
+                const dateKey = `${year}-${meshMonth}-${meshDay}`;
+
+                dayDiv.className = "min-h-[75px] border border-gray-100 p-1 rounded-xl flex flex-col justify-between text-left relative transition bg-white";
+                
+                // Estructura interna del día
+                let dayNumberHTML = `<span class="text-xs font-bold text-gray-600">${day}</span>`;
+                let indicatorsHTML = `<div class="flex flex-wrap gap-0.5 mt-0.5">`;
+                let stickerHTML = `<div class="text-center text-sm my-auto"></div>`;
+
+                // Verificar si hay registros guardados en esta fecha
+                if (db[dateKey]) {
+                    const data = db[dateKey];
+
+                    // Fondo si está con periodo activo
+                    if (data.periodStatus === 'inicio' || data.periodStatus === 'continua') {
+                        dayDiv.classList.add('bg-red-100');
+                    }
+
+                    // Icono de relaciones
+                    if (data.hadSex) {
+                        indicatorsHTML += `<span title="Relaciones">💞</span>`;
+                    }
+
+                    // Icono de inyección aplicada hoy
+                    if (data.injectionDay) {
+                        indicatorsHTML += `<span class="bg-purple-500 w-2 h-2 rounded-full" title="Inyección Aplicada"></span>`;
+                    }
+
+                    // Agregar Sticker de estado de ánimo / síntoma
+                    if (data.mood) {
+                        stickerHTML = `<div class="text-center text-lg filter drop-shadow-sm" title="${data.symptoms || 'Sin descripción de síntomas'}">${data.mood}</div>`;
+                    }
+
+                    // Si hay síntomas escritos, añadir un indicador visual discreto abajo
+                    if (data.symptoms) {
+                        dayDiv.classList.add('border-b-2', 'border-b-rose-400');
+                    }
+                } else {
+                    // Si no hay datos reales ingresados, evaluar si pertenece a predicción o cobertura
+                    if (tentativeRanges[dateKey]) {
+                        dayDiv.classList.add('bg-pink-50', 'border-dashed', 'border-pink-300');
+                    }
+                }
+
+                // Evaluar si cae dentro de los días de cobertura de la inyección
+                if (injectionRanges[dateKey]) {
+                    dayDiv.classList.add('ring-2', 'ring-purple-200', 'ring-inset');
+                }
+
+                indicatorsHTML += `</div>`;
+                
+                dayDiv.innerHTML = `
+                    <div class="flex justify-between items-start w-full">
+                        ${dayNumberHTML}
+                        ${indicatorsHTML}
+                    </div>
+                    ${stickerHTML}
+                `;
+
+                // Al hacer clic en un día del calendario, cargar esa fecha en el formulario
+                dayDiv.addEventListener('click', () => {
+                    dateInput.value = dateKey;
+                    // Cargar datos previos si existen
+                    if (db[dateKey]) {
+                        const data = db[dateKey];
+                        document.querySelector(`input[name="periodStatus"][value="${data.periodStatus}"]`).checked = true;
+                        document.getElementById('symptoms').value = data.symptoms || '';
+                        document.querySelector(`input[name="mood"][value="${data.mood}"]`).checked = true;
+                        document.getElementById('hadSex').checked = data.hadSex || false;
+                        document.getElementById('injectionDay').checked = data.injectionDay || false;
+                        if(data.injectionDuration) document.getElementById('injectionDuration').value = data.injectionDuration;
+                    } else {
+                        form.reset();
+                        dateInput.value = dateKey;
+                    }
+                    updateMoodVisuals();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                calendarDaysContainer.appendChild(dayDiv);
+            }
+        }
+
+        // Navegación del calendario
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Carga inicial
+        renderCalendar();
+    </script>
+</body>
+</html>
